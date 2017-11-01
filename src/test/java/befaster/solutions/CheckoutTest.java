@@ -3,8 +3,6 @@ package befaster.solutions;
 import org.junit.Test;
 
 
-import java.util.Optional;
-
 import static befaster.solutions.Checkout.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -25,7 +23,7 @@ public class CheckoutTest {
     }
 
     @Test
-    public void checkoutAReturnValue() throws Exception{
+    public void checkoutAReturnAValue() throws Exception{
         final int checkout = checkout(FIRST_PROD);
         assertEquals(FIRST_PROD_SINGLE_COST, checkout);
     }
@@ -51,7 +49,7 @@ public class CheckoutTest {
     @Test
     public void checkoutAAAReturnOfferAValue() throws Exception{
         final int checkout = checkout(FIRST_PROD+FIRST_PROD+FIRST_PROD);
-        assertEquals(OFFER_A_COST, checkout);
+        assertEquals(OFFER_A3_COST, checkout);
     }
 
     @Test
@@ -61,21 +59,45 @@ public class CheckoutTest {
     }
 
     @Test
-    public void getOfferFromAReturnsNotEmpty() throws Exception{
-        final Optional<Offer> offer = Checkout.getOffer(FIRST_PROD);
-        assertTrue(offer.isPresent());
+    public void calculatePriceA1ReturnAPrice() throws Exception {
+        final int price = calculateBasketPrice(FIRST_PROD, 1);
+        assertEquals(FIRST_PROD_SINGLE_COST, price);
     }
 
     @Test
-    public void calculatePriceA1ReturnAPrice() throws Exception {
-        final int price = calculatePrice(FIRST_PROD, 1);
-        assertEquals(FIRST_PROD_SINGLE_COST, price);
+    public void checkoutTwoOffersIGetTheBestOne() throws Exception{
+        final int checkout = checkout(5 + FIRST_PROD);
+        assertEquals(OFFER_A5_COST, checkout);
+    }
+
+    @Test
+    public void checkoutTwoFreeOffersIBoth() throws Exception{
+        final int checkout = checkout(4 + FIFTH_PROD + " " + 2 + SECOND_PROD);
+        assertEquals(4 * FIFTH_PROD_SINGLE_COST, checkout);
+    }
+
+    @Test
+    public void checkoutTwoFreeOffersPlusOneReturnOffersPricePlusOne() throws Exception{
+        final int checkout = checkout(4 + FIFTH_PROD + " " + 3 + SECOND_PROD);
+        assertEquals(4 * FIFTH_PROD_SINGLE_COST + SECOND_PROD_SINGLE_COST, checkout);
+    }
+
+    @Test
+    public void checkoutOneFreeOffersPlusOneReturnOffersPricePlusOne() throws Exception{
+        final int checkout = checkout(2 + FIFTH_PROD + " " + 2 + SECOND_PROD);
+        assertEquals(2 * FIFTH_PROD_SINGLE_COST + SECOND_PROD_SINGLE_COST, checkout);
+    }
+
+    @Test
+    public void checkoutOneFreeOffersPlusOneReducedOffersPricePlusOne() throws Exception{
+        final int checkout = checkout(2 + FIFTH_PROD + " " + 3 + SECOND_PROD);
+        assertEquals(2 * FIFTH_PROD_SINGLE_COST + OFFER_B2_COST, checkout);
     }
 
     @Test
     public void checkoutOfferAReturnOfferValue() throws Exception{
         final int checkout = checkout(3 + FIRST_PROD);
-        assertEquals(OFFER_A_COST, checkout);
+        assertEquals(OFFER_A3_COST, checkout);
     }
 
     @Test
