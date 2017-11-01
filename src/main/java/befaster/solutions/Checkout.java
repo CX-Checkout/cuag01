@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Chars;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,8 +55,48 @@ public class Checkout {
         protected abstract boolean matches(Basket basket);
     }
 
-    public static class ReducedPrice extends Benefit {
+    public static class AnyOf extends Benefit{
         protected static final int PRIORITY = 2;
+        final Set<String> productGroup;
+        final int totalPrice;
+        final int quantity;
+
+        public AnyOf(Set<String> productGroup, int totalPrice, int quantity) {
+            super(PRIORITY);
+            this.productGroup = productGroup;
+            this.totalPrice = totalPrice;
+            this.quantity = quantity;
+        }
+
+        @Override
+        protected void applyOnBasket(Basket basket) {
+            if(matches(basket)){
+                AtomicInteger i = new AtomicInteger(quantity);
+                productGroup.forEach(
+                        prod -> {
+                            Long nProd = basket.skus.getOrDefault(prod, 0L);
+                            if(i.intValue() > 0){
+
+                            }
+                        }
+                );
+            }
+
+        }
+
+        @Override
+        protected boolean matches(Basket basket) {
+            final long sum = basket.skus.entrySet().stream()
+                    .filter(e -> productGroup.contains(e.getKey()))
+                    .map(e -> e.getValue())
+                    .mapToLong(i -> i)
+                    .sum();
+            return sum >= quantity;
+        }
+    }
+
+    public static class ReducedPrice extends Benefit {
+        protected static final int PRIORITY = 3;
         final String product;
         Integer quantity;
         final int totalPrice;
