@@ -206,12 +206,32 @@ public class Checkout {
 
 
     static {
-        PROD_COSTS.put(FIRST_PROD, FIRST_PROD_SINGLE_COST);
-        PROD_COSTS.put(SECOND_PROD, SECOND_PROD_SINGLE_COST);
-        PROD_COSTS.put(THIRD_PROD, THIRD_PROD_SINGLE_COST);
-        PROD_COSTS.put(FOURTH_PROD, FOURTH_PROD_SINGLE_COST);
-        PROD_COSTS.put(FIFTH_PROD, FIFTH_PROD_SINGLE_COST);
-        PROD_COSTS.put(SIXTH_PROD, SIXTH_PROD_SINGLE_COST);
+        PROD_COSTS.put("A",50);
+        PROD_COSTS.put("B",30);
+        PROD_COSTS.put("C",20);
+        PROD_COSTS.put("D",15);
+        PROD_COSTS.put("E",40);
+        PROD_COSTS.put("F",10);
+        PROD_COSTS.put("G",20);
+        PROD_COSTS.put("H",10);
+        PROD_COSTS.put("I",35);
+        PROD_COSTS.put("J",60);
+        PROD_COSTS.put("K",80);
+        PROD_COSTS.put("L",90);
+        PROD_COSTS.put("M",15);
+        PROD_COSTS.put("N",40);
+        PROD_COSTS.put("O",10);
+        PROD_COSTS.put("P",50);
+        PROD_COSTS.put("Q",30);
+        PROD_COSTS.put("R",50);
+        PROD_COSTS.put("S",30);
+        PROD_COSTS.put("T",20);
+        PROD_COSTS.put("U",40);
+        PROD_COSTS.put("V",50);
+        PROD_COSTS.put("W",20);
+        PROD_COSTS.put("X",90);
+        PROD_COSTS.put("Y",10);
+        PROD_COSTS.put("Z",50);
     }
 
     public static final Set<String> PRODUCTS = PROD_COSTS.keySet();
@@ -221,7 +241,17 @@ public class Checkout {
                     Offer.of(ProductMatch.of(FIRST_PROD, 5), ReducedPrice.of(FIRST_PROD, 5, OFFER_A5_COST)),
                     Offer.of(ProductMatch.of(SECOND_PROD, 2), ReducedPrice.of(SECOND_PROD, 2, OFFER_B2_COST)),
                     Offer.of(ProductMatch.of(FIFTH_PROD, 2), FreeProduct.of(SECOND_PROD)),
-                    Offer.of(ProductMatch.of(SIXTH_PROD, 3), FreeProduct.of(SIXTH_PROD))
+                    Offer.of(ProductMatch.of(SIXTH_PROD, 3), FreeProduct.of(SIXTH_PROD)),
+                    Offer.of(ProductMatch.of("H", 5), ReducedPrice.of("H", 5, 45)),
+                    Offer.of(ProductMatch.of("H", 10), ReducedPrice.of("H", 10, 80)),
+                    Offer.of(ProductMatch.of("K", 2), ReducedPrice.of("K", 2, 150)),
+                    Offer.of(ProductMatch.of("N", 3), FreeProduct.of("M")),
+                    Offer.of(ProductMatch.of("P", 5), ReducedPrice.of("P", 5, 200)),
+                    Offer.of(ProductMatch.of("Q", 3), ReducedPrice.of("Q", 3, 80)),
+                    Offer.of(ProductMatch.of("R", 3), FreeProduct.of("Q")),
+                    Offer.of(ProductMatch.of("U", 4), FreeProduct.of("U")),
+                    Offer.of(ProductMatch.of("V", 2), ReducedPrice.of("V", 2, 90)),
+                    Offer.of(ProductMatch.of("V", 3), ReducedPrice.of("V", 3, 130))
 
             );
 
