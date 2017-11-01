@@ -17,6 +17,7 @@ public class Checkout {
     public static final String THIRD_PROD = "C";
     public static final String FOURTH_PROD = "D";
     public static final String FIFTH_PROD = "E";
+    public static final String SIXTH_PROD = "F";
 
     public static class Basket{
         final HashMap<String, Long> skus;
@@ -49,6 +50,8 @@ public class Checkout {
         public int compareTo(Benefit that) {
             return (this.priority - that.priority);
         }
+
+        protected abstract boolean matches(Basket basket);
     }
 
     public static class ReducedPrice extends Benefit {
@@ -76,7 +79,8 @@ public class Checkout {
             }
         }
 
-        private boolean matches(Basket basket) {
+        @Override
+        protected boolean matches(Basket basket) {
             return basket.skus.getOrDefault(product, 0L) >= quantity;
         }
     }
@@ -96,7 +100,14 @@ public class Checkout {
 
         @Override
         protected void applyOnBasket(Basket basket) {
-            basket.skus.computeIfPresent(product, (key,value) -> value > 0 ? value -1 : 0);
+            if(matches(basket)) {
+                basket.skus.computeIfPresent(product, (key, value) -> value > 0 ? value - 1 : 0);
+            }
+        }
+
+        @Override
+        protected boolean matches(Basket basket) {
+            return basket.skus.getOrDefault(product, 0L) > 0;
         }
     }
 
@@ -118,7 +129,9 @@ public class Checkout {
         }
 
         void applyOnBasket(Basket basket) {
-            benefit.applyOnBasket(basket);
+            if(benefit.matches(basket)) {
+                benefit.applyOnBasket(basket);
+            }
         }
 
         @Override
@@ -179,13 +192,13 @@ public class Checkout {
     protected static final String DIGITS = "[\\d]";
 
     public static final Map<String, Integer> PROD_COSTS = new HashMap<>();
-    public static final Map<ProductMatch, Integer> OFFERS_COSTS = new HashMap<>();
 
     public static final int FIRST_PROD_SINGLE_COST = 50;
     public static final int SECOND_PROD_SINGLE_COST = 30;
     public static final int THIRD_PROD_SINGLE_COST = 20;
     public static final int FOURTH_PROD_SINGLE_COST = 15;
     public static final int FIFTH_PROD_SINGLE_COST = 40;
+    public static final int SIXTH_PROD_SINGLE_COST = 10;
 
     public static final int OFFER_A3_COST = 130;
     public static final int OFFER_A5_COST = 200;
@@ -198,6 +211,7 @@ public class Checkout {
         PROD_COSTS.put(THIRD_PROD, THIRD_PROD_SINGLE_COST);
         PROD_COSTS.put(FOURTH_PROD, FOURTH_PROD_SINGLE_COST);
         PROD_COSTS.put(FIFTH_PROD, FIFTH_PROD_SINGLE_COST);
+        PROD_COSTS.put(SIXTH_PROD, SIXTH_PROD_SINGLE_COST);
     }
 
     public static final Set<String> PRODUCTS = PROD_COSTS.keySet();
@@ -206,7 +220,8 @@ public class Checkout {
                     Offer.of(ProductMatch.of(FIRST_PROD, 3), ReducedPrice.of(FIRST_PROD, 3,OFFER_A3_COST)),
                     Offer.of(ProductMatch.of(FIRST_PROD, 5), ReducedPrice.of(FIRST_PROD, 5, OFFER_A5_COST)),
                     Offer.of(ProductMatch.of(SECOND_PROD, 2), ReducedPrice.of(SECOND_PROD, 2, OFFER_B2_COST)),
-                    Offer.of(ProductMatch.of(FIFTH_PROD, 2), FreeProduct.of(SECOND_PROD))
+                    Offer.of(ProductMatch.of(FIFTH_PROD, 2), FreeProduct.of(SECOND_PROD)),
+                    Offer.of(ProductMatch.of(SIXTH_PROD, 3), FreeProduct.of(SIXTH_PROD))
 
             );
 
@@ -223,8 +238,7 @@ public class Checkout {
 
     private static int calculateBasketPrice(final Basket basket) {
         final List<Offer> offers = findMatchingOffers(new HashMap<>(basket.skus));
-        offers.stream()
-                .peek(Checkout::test)
+        offers.stream().sorted()
                 .forEach(offer -> offer.applyOnBasket(basket));
         PROD_COSTS.forEach((product, cost) -> applyCostOnBasket(basket, product, cost));
         return basket.cost;
@@ -264,32 +278,8 @@ public class Checkout {
     }
 
 
-    static int calculateBasketPrice(String prod, int value) {
-        final Optional<OfferMatch> matchingOffer = getMatchingOffer(prod, value);
-        if (!matchingOffer.isPresent()) return getSimplePrice(prod) * value;
-        final OfferMatch offerMatch = matchingOffer.get();
-        int remaining = (int) (value - offerMatch.nMatches * offerMatch.productMatch.quantity);
-        return offerMatch.nMatches * OFFERS_COSTS.get(offerMatch.productMatch) + getSimplePrice(prod) * remaining;
-    }
-
-    private static Optional<OfferMatch> getMatchingOffer(String prod, int nProds) {
-        final Optional<ProductMatch> offer = getOffer(prod);
-        return offer.flatMap(productMatchVal -> makeOfferMatch(productMatchVal, nProds));
-    }
-
     private static Optional<OfferMatch> makeOfferMatch(ProductMatch productMatch, int nProds) {
         return nProds >= productMatch.quantity ? Optional.of(new OfferMatch(productMatch, (int) (nProds / productMatch.quantity))) : Optional.empty();
-    }
-
-    static Optional<ProductMatch> getOffer(String prod) {
-        return OFFERS_COSTS.keySet()
-                .stream()
-                .filter(productMatch -> productMatch.product.equals(prod))
-                .findFirst();
-    }
-
-    private static Integer getSimplePrice(String prod) {
-        return PROD_COSTS.get(prod);
     }
 
     private static Map<String, Long> skusToMap(String skus) {

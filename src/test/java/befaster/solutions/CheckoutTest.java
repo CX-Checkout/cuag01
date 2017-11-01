@@ -58,11 +58,11 @@ public class CheckoutTest {
         assertEquals(FOURTH_PROD_SINGLE_COST, checkout);
     }
 
-    @Test
+    /*@Test
     public void calculatePriceA1ReturnAPrice() throws Exception {
         final int price = calculateBasketPrice(FIRST_PROD, 1);
         assertEquals(FIRST_PROD_SINGLE_COST, price);
-    }
+    }*/
 
     @Test
     public void checkoutTwoOffersIGetTheBestOne() throws Exception{
@@ -71,9 +71,21 @@ public class CheckoutTest {
     }
 
     @Test
-    public void checkoutTwoFreeOffersIBoth() throws Exception{
+    public void checkoutTwoFreeOffersIReturnBoth() throws Exception{
         final int checkout = checkout(4 + FIFTH_PROD + " " + 2 + SECOND_PROD);
         assertEquals(4 * FIFTH_PROD_SINGLE_COST, checkout);
+    }
+
+    @Test
+    public void checkoutTwoSixthProductsReturnsCostOfTwo() throws Exception{
+        final int checkout = checkout(2 + SIXTH_PROD);
+        assertEquals(2 * SIXTH_PROD_SINGLE_COST, checkout);
+    }
+
+    @Test
+    public void checkoutThreeSixthProductsReturnsCostOfTwo() throws Exception{
+        final int checkout = checkout(3 + SIXTH_PROD);
+        assertEquals(2 * SIXTH_PROD_SINGLE_COST, checkout);
     }
 
     @Test
